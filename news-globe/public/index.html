@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>ORBIT — live world events</title>
+<!-- Remove any leftover service worker / caches from a previous app on this origin. -->
+<script>
+(function(){try{
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      var had = regs.length>0 && !!navigator.serviceWorker.controller;
+      Promise.all(regs.map(function(r){return r.unregister();})).then(function(){
+        if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k);});});}
+        if(had && !sessionStorage.getItem('sw_cleaned')){ sessionStorage.setItem('sw_cleaned','1'); location.reload(); }
+      });
+    }).catch(function(){});
+  }
+}catch(e){}})();
+</script>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="loader" id="loader">Connecting to live feeds…</div>
+  <canvas id="globe"></canvas>
+
+  <header class="topbar">
+    <div class="brand"><span class="dot"></span>ORBIT</div>
+    <div class="spacer"></div>
+    <select class="themeSel" id="themeSel" title="Theme"></select>
+    <button class="iconbtn" id="refresh" title="Refresh now">&#10227;</button>
+    <div class="livebadge"><i></i>Live</div>
+    <div class="clock" id="clock">--:--:-- IST</div>
+  </header>
+
+  <div class="ticker"><div class="track" id="ticker"></div></div>
+
+  <aside class="lpanel" id="lpanel">
+    <div class="lhead">Countries</div>
+    <div class="clist" id="clist"></div>
+  </aside>
+
+  <aside class="panel">
+    <div class="phead">
+      <div class="eyebrow">Live events</div>
+      <div class="status" id="status"><span class="led"></span><span id="statusText">Loading…</span></div>
+      <div class="rowtools">
+        <input id="search" placeholder="Search events &amp; places…" />
+        <button class="toggle on" id="autoBtn" title="Auto-scroll feed">&#11107; Auto</button>
+      </div>
+      <div class="filters" id="filters"></div>
+    </div>
+    <div class="feed" id="feed"></div>
+
+    <div class="detail" id="detail">
+      <button class="back" id="back">&#8249; Back to feed</button>
+      <div class="dbody" id="detailBody"></div>
+    </div>
+  </aside>
+
+  <div class="legend" id="legend"></div>
+  <div class="hint"><b>drag</b> spin &middot; <b>scroll</b> zoom &middot; <b>click a ping</b> for the AI brief</div>
+
+<!-- three.js bundled locally (no CDN) so it works under any Content Security Policy -->
+<script src="vendor/three.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
